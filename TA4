@@ -1,14 +1,12 @@
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
-from tkinter import PhotoImage
-from PIL import Image, ImageTk
 
 # Membuat koneksi ke database SQLite
 conn = sqlite3.connect('toko.db')
 c = conn.cursor()
 
-# Membuat tabel jika belum ada
+# Membuat tabel 
 c.execute('''CREATE TABLE IF NOT EXISTS barang
              (kode TEXT PRIMARY KEY, nama TEXT, harga REAL)''')
 conn.commit()
@@ -23,7 +21,7 @@ class App:
         # Frame untuk tampilan utama
         self.frame_main = tk.Frame(self.root)
         self.frame_main.pack(pady=20, expand=True, fill="both")
-        self.frame_main.configure(bg="lightblue")  # Ganti warna latar belakang dengan biru muda.
+        self.frame_main.configure(bg="lightblue")  
 
         self.label_main = tk.Label(self.frame_main, text="Selamat Datang di Aplikasi Perhitungan Kasir", font=("Times New Roman", 16),padx=20,pady=10,bd=2,bg="lightblue")
         self.label_main.pack(pady=10)
