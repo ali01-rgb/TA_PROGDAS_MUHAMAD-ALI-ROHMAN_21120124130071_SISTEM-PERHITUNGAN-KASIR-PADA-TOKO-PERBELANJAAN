@@ -1,0 +1,294 @@
+import tkinter as tk
+from tkinter import messagebox
+import sqlite3
+
+# Membuat koneksi ke database SQLite
+conn = sqlite3.connect('toko.db')
+c = conn.cursor()
+
+# Membuat tabel jika belum ada
+c.execute('''CREATE TABLE IF NOT EXISTS barang
+             (kode TEXT PRIMARY KEY, nama TEXT, harga REAL)''')
+conn.commit()
+
+class App:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Aplikasi Perhitungan Kasir")
+        self.root.geometry("1920x1200")
+        self.root.resizable(True, True)
+
+        # Frame untuk tampilan utama
+        self.frame_main = tk.Frame(self.root)
+        self.frame_main.pack(pady=20, expand=True, fill="both")
+        self.frame_main.configure(bg="lightblue")  
+        self.label_main = tk.Label(self.frame_main, text="Selamat Datang di Aplikasi Perhitungan Kasir", font=("Times New Roman", 16),padx=20,pady=10,bd=2,bg="lightblue")
+        self.label_main.pack(pady=10)
+
+        self.btn_data_barang = tk.Button(self.frame_main, text="Masukkan Barang ke Database", command=self.show_data_barang,bg="#4682b4",fg="#ffffff",padx=20,pady=10,relief="raised",bd=2,)
+        self.btn_data_barang.pack(pady=5)
+
+        self.btn_hitung_pembelian = tk.Button(self.frame_main, text="Hitung Total Pembelian", command=self.show_hitung_pembelian,bg="#4682b4",fg="#ffffff",padx=20,pady=10,relief="raised",bd=2,)
+        self.btn_hitung_pembelian.pack(pady=5)
+
+        self.btn_lihat = tk.Button(self.frame_main, text="Lihat Barang", command=self.show_lihat_barang,bg="#4682b4",fg="#ffffff",padx=20,pady=10,relief="raised",bd=2,)
+        self.btn_lihat.pack(pady=5)
+
+        self.btn_edit_barang = tk.Button(self.frame_main, text="Edit Barang", command=self.show_edit_barang,bg="#4682b4",fg="#ffffff",padx=20,pady=10,relief="raised",bd=2,)
+        self.btn_edit_barang.pack(pady=5)
+
+        self.btn_hapus_barang = tk.Button(self.frame_main, text="Hapus Barang", command=self.show_hapus_barang,bg="#4682b4",fg="#ffffff",padx=20,pady=10,relief="raised",bd=2,)
+        self.btn_hapus_barang.pack(pady=5)
+
+        # Frame lainnya
+        self.setup_frame_tambah()
+        self.setup_frame_edit()
+        self.setup_frame_hitung()
+        self.setup_frame_lihat()
+        self.setup_frame_hapus()
+
+    def setup_frame_tambah(self):
+        self.frame_tambah = tk.Frame(self.root, bg="lightblue")
+        self.label_kode = tk.Label(self.frame_tambah, text="Kode Barang :", bg="lightblue")
+        self.label_kode.grid(row=0, column=0)
+        self.entry_kode = tk.Entry(self.frame_tambah)
+        self.entry_kode.grid(row=0, column=1, pady=5)
+
+        self.label_nama = tk.Label(self.frame_tambah, text="Nama Barang :", bg="lightblue")
+        self.label_nama.grid(row=1, column=0)
+        self.entry_nama = tk.Entry(self.frame_tambah)
+        self.entry_nama.grid(row=1, column=1, pady=5)
+
+        self.label_harga = tk.Label(self.frame_tambah, text="Harga Barang :", bg="lightblue")
+        self.label_harga.grid(row=2, column=0)
+        self.entry_harga = tk.Entry(self.frame_tambah)
+        self.entry_harga.grid(row=2, column=1, padx=10, pady=5)
+
+        btn_tambah = tk.Button(self.frame_tambah, text="Tambah Barang", command=self.tambah_barang)
+        btn_tambah.grid(row=3, columnspan=2, pady=10)
+
+        self.btn_kembali_tambah = tk.Button(self.frame_tambah, text="Kembali", command=self.show_main)
+        self.btn_kembali_tambah.grid(row=4, columnspan=2, pady=10)
+
+    def setup_frame_edit(self):
+        self.frame_edit = tk.Frame(self.root, bg="lightblue")
+        self.label_kode_edit = tk.Label(self.frame_edit, text="Kode Barang :", bg="lightblue")
+        self.label_kode_edit.grid(row=0, column=0)
+        self.entry_kode_edit = tk.Entry(self.frame_edit)
+        self.entry_kode_edit.grid(row=0, column=1, pady=5)
+
+        self.label_nama_edit = tk.Label(self.frame_edit, text="Nama Baru :", bg="lightblue")
+        self.label_nama_edit.grid(row=1, column=0)
+        self.entry_nama_edit = tk.Entry(self.frame_edit)
+        self.entry_nama_edit.grid(row=1, column=1, pady=5)
+
+        self.label_harga_edit = tk.Label(self.frame_edit, text="Harga Baru :", bg="lightblue")
+        self.label_harga_edit.grid(row=2, column=0)
+        self.entry_harga_edit = tk.Entry(self.frame_edit)
+        self.entry_harga_edit.grid(row=2, column=1, padx=10, pady=5)
+
+        btn_edit = tk.Button(self.frame_edit, text="Simpan Perubahan", command= self.edit_barang)
+        btn_edit.grid(row=3, columnspan=2, pady=10)
+
+        self.btn_kembali_edit = tk.Button(self.frame_edit, text="Kembali", command=self.show_main)
+        self.btn_kembali_edit.grid(row=4, columnspan=2, pady=10)
+
+    def setup_frame_hitung(self):
+        self.frame_hitung = tk.Frame(self.root, bg="lightblue")
+        self.label_cari = tk.Label(self.frame_hitung, text="Masukkan Kode Barang ( Kode x Jumlah):", bg="lightblue")
+        self.label_cari.grid(row=0, column=0, columnspan=2, pady=5)
+
+        self.entry_cari = tk.Entry(self.frame_hitung, width=30)
+        self.entry_cari.grid(row=1, column=0, columnspan=2, pady=5)
+
+        self.btn_hitung = tk.Button(self.frame_hitung, text="Hitung Total", command=self.hitung_pembelian)
+        self.btn_hitung.grid(row=2, column=0, columnspan=2, pady=10)
+
+        self.label_hasil = tk.Label(self.frame_hitung, text="", justify="left", wraplength=400)
+        self.label_hasil.grid(row=3, column=0, columnspan=2, pady=10)
+
+        self.btn_kembali_hitung = tk.Button(self.frame_hitung, text="Kembali", command=self.show_main)
+        self.btn_kembali_hitung.grid(row=4, column=0, columnspan=2, pady=10)
+
+    def setup_frame_lihat(self):
+        self.frame_lihat = tk.Frame(self.root, bg="lightblue")
+        self.text_widget = tk.Text(self.frame_lihat, height=15, width=50,bg="white", fg="black")
+        self.text_widget.pack(pady=10)
+
+        self.btn_kembali_lihat = tk.Button(self.frame_lihat, text="Kembali", command=self.show_main)
+        self.btn_kembali_lihat.pack(pady=5)
+
+    def setup_frame_hapus(self):
+        self.frame_hapus = tk.Frame(self.root, bg="lightblue")
+        self.label_hapus = tk.Label(self.frame_hapus, text="Masukkan Kode Barang yang Ingin Dihapus:", bg="lightblue")
+        self.label_hapus.grid(row=0, column=0, padx=10, pady=10)
+
+        self.entry_hapus = tk.Entry(self.frame_hapus)
+        self.entry_hapus.grid(row=0, column=1, padx=10, pady=10)
+
+        self.btn_hapus = tk.Button(self.frame_hapus, text="Hapus Barang", command=self.hapus_barang)
+        self.btn_hapus.grid(row=1, column=0, columnspan=2, pady=10)
+
+        self.btn_kembali_hapus = tk.Button(self.frame_hapus, text="Kembali", command=self.show_main)
+        self.btn_kembali_hapus.grid(row=2, column=0, columnspan=2, pady=10)
+
+    # Fungsi untuk menambah barang ke database
+    def tambah_barang(self):
+        kode = self.entry_kode.get()
+        nama = self.entry_nama.get()
+        harga = self.entry_harga.get()
+
+        if kode and nama and harga:
+            try:
+                if c.execute("SELECT 1 FROM barang WHERE kode=?", (kode,)).fetchone():
+                    messagebox.showerror("Error", "Kode barang sudah ada!")
+                    return
+                harga = float(harga)
+                c.execute("INSERT INTO barang (kode, nama, harga) VALUES (?, ?, ?)", (kode, nama, harga))
+                conn.commit()
+                messagebox.showinfo("Info", "Barang berhasil ditambahkan ke dalam database!")
+                self.entry_kode.delete(0, tk.END)
+                self.entry_nama.delete(0, tk.END)
+                self.entry_harga.delete(0, tk.END)
+            except ValueError:
+                messagebox.showerror("Error", "Harga harus berupa angka!")
+        else:
+            messagebox.showwarning("Warning", "Semua field harus diisi!")
+
+    
+    # Fungsi untuk melihat barang
+    def show_lihat_barang(self):
+        self.frame_main.pack_forget()
+        self.frame_lihat.pack(pady=20)
+
+        self.text_widget.delete("1.0", tk.END)
+        c.execute("SELECT * FROM barang")
+        rows = c.fetchall()
+        if rows:
+            for row in rows:
+                self.text_widget.insert(tk.END, f"Kode: {row[0]}, Nama: {row[1]}, Harga: {row[2]}\n")
+        else:
+            self.text_widget.insert(tk.END, "Tidak ada data barang dalam database.")
+
+    # Fungsi untuk menghitung total pembelian
+    def hitung_pembelian(self):
+        input_data = self.entry_cari.get().strip()
+        if not input_data:
+            messagebox.showwarning("Warning", "Masukkan kode barang dan jumlah!")
+            return
+
+        items = input_data.split(",")
+        total_harga = 0
+        detail_barang = ""
+
+        for item in items:
+            try:
+                kode, jumlah = item.split("x") #digunakan huruf "x" sebagai ganti untuk simbol perkalian
+                jumlah = int(jumlah.strip())
+                kode = kode.strip()
+
+                c.execute("SELECT * FROM barang WHERE kode=?", (kode,))
+                barang = c.fetchone()
+                if barang:
+                    nama, harga = barang[1], barang[2]
+                    total_item = jumlah * harga
+                    pajak = total_item * 0.1
+                    total_harga += total_item + pajak
+                    detail_barang += (
+                        f"Nama Barang: {nama}\n"
+                        f"Kode Barang: {kode}\n"
+                        f"Harga Satuan: {harga}\n"
+                        f"Jumlah: {jumlah}\n"
+                        f"Total Harga (sebelum pajak): {total_item}\n"
+                        f"Total Harga (setelah pajak): {total_item + pajak:.2f}\n\n"
+                    )
+                else:
+                    detail_barang += f"Barang dengan kode {kode} tidak ditemukan!\n\n"
+            except ValueError:
+                detail_barang += f"Format input salah untuk item: {item}. Gunakan format kode x jumlah.\n\n"
+
+        if detail_barang:
+            self.label_hasil.config(
+                text=f"Detail Pembelian:\n\n{detail_barang}Total Harga Semua Barang: {total_harga:.2f}\n\nTerima kasih telah berbelanja!"
+            )
+        else:
+            messagebox.showwarning("Warning", "Masukkan kode barang yang valid!")
+
+    # Fungsi untuk menghapus barang
+    def hapus_barang(self):
+        kode = self.entry_hapus.get().strip()
+        if not kode:
+            messagebox.showwarning("Warning", "Kode barang harus diisi!")
+            return
+
+        c.execute("DELETE FROM barang WHERE kode=?", (kode,))
+        if c.rowcount:
+            conn.commit()
+            messagebox.showinfo("Info", "Barang berhasil dihapus!")
+        else:
+            messagebox.showerror("Error", "Kode barang tidak ditemukan!")
+
+        self.entry_hapus.delete(0, tk.END)
+
+    def edit_barang(self):
+        kode = self.entry_kode_edit.get()
+        nama = self.entry_nama_edit.get()
+        harga = self.entry_harga_edit.get()
+
+        if kode and (nama or harga):
+            try:
+                if harga:
+                    harga = float(harga)
+                    c.execute("UPDATE barang SET nama = ?, harga = ? WHERE kode = ?", (nama, harga, kode))
+                else:
+                    c.execute("UPDATE barang SET nama = ? WHERE kode = ?", (nama, kode))
+                conn.commit()
+
+                if c.rowcount:
+                    messagebox.showinfo("Info", "Barang berhasil diperbarui!")
+                else:
+                    messagebox.showerror("Error", "Kode barang tidak ditemukan!")
+
+                self.entry_kode_edit.delete(0, tk.END)
+                self.entry_nama_edit.delete(0, tk.END)
+                self.entry_harga_edit.delete(0, tk.END)
+            except ValueError:
+                messagebox.showerror("Error", "Harga harus berupa angka!")
+        else:
+            messagebox.showwarning("Warning", "Kode barang dan salah satu field baru harus diisi!")
+
+    # Fungsi navigasi
+    def show_hapus_barang(self):
+        self.frame_main.pack_forget()
+        self.frame_hapus.pack(pady=20)
+    
+    def show_edit_barang(self):
+        self.frame_main.pack_forget()
+        self.frame_edit.pack(pady=20)
+
+    def show_data_barang(self):
+        self.frame_main.pack_forget()
+        self.frame_tambah.pack(pady=20)
+
+    def show_hitung_pembelian(self):
+        self.frame_main.pack_forget()
+        self.frame_hitung.pack(pady=20)
+
+    def show_main(self):
+        # Sembunyikan semua frame
+        for frame in [self.frame_tambah, self.frame_hitung, self.frame_lihat, self.frame_edit, self.frame_hapus]:
+            frame.pack_forget()
+        self.frame_main.pack(pady=20, expand=True, fill="both")
+        self.frame_tambah.pack_forget()
+        self.frame_hitung.pack_forget()
+        self.frame_lihat.pack_forget()
+        self.frame_edit.pack_forget()
+        self.frame_hapus.pack_forget()
+        self.frame_main.pack(pady=20)
+
+# Jalankan aplikasi
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = App(root)
+    root.mainloop()
+    conn.close()
