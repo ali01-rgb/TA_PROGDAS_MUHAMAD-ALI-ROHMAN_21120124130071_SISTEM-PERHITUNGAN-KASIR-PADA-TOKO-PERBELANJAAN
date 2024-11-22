@@ -6,7 +6,7 @@ import sqlite3
 conn = sqlite3.connect('toko.db')
 c = conn.cursor()
 
-# Membuat tabel 
+# Membuat tabel jika belum ada
 c.execute('''CREATE TABLE IF NOT EXISTS barang
              (kode TEXT PRIMARY KEY, nama TEXT, harga REAL)''')
 conn.commit()
@@ -22,7 +22,6 @@ class App:
         self.frame_main = tk.Frame(self.root)
         self.frame_main.pack(pady=20, expand=True, fill="both")
         self.frame_main.configure(bg="lightblue")  
-
         self.label_main = tk.Label(self.frame_main, text="Selamat Datang di Aplikasi Perhitungan Kasir", font=("Times New Roman", 16),padx=20,pady=10,bd=2,bg="lightblue")
         self.label_main.pack(pady=10)
 
@@ -49,18 +48,18 @@ class App:
         self.setup_frame_hapus()
 
     def setup_frame_tambah(self):
-        self.frame_tambah = tk.Frame(self.root)
-        self.label_kode = tk.Label(self.frame_tambah, text="Kode Barang :")
+        self.frame_tambah = tk.Frame(self.root, bg="lightblue")
+        self.label_kode = tk.Label(self.frame_tambah, text="Kode Barang :", bg="lightblue")
         self.label_kode.grid(row=0, column=0)
         self.entry_kode = tk.Entry(self.frame_tambah)
         self.entry_kode.grid(row=0, column=1, pady=5)
 
-        self.label_nama = tk.Label(self.frame_tambah, text="Nama Barang :")
+        self.label_nama = tk.Label(self.frame_tambah, text="Nama Barang :", bg="lightblue")
         self.label_nama.grid(row=1, column=0)
         self.entry_nama = tk.Entry(self.frame_tambah)
         self.entry_nama.grid(row=1, column=1, pady=5)
 
-        self.label_harga = tk.Label(self.frame_tambah, text="Harga Barang :")
+        self.label_harga = tk.Label(self.frame_tambah, text="Harga Barang :", bg="lightblue")
         self.label_harga.grid(row=2, column=0)
         self.entry_harga = tk.Entry(self.frame_tambah)
         self.entry_harga.grid(row=2, column=1, padx=10, pady=5)
@@ -72,21 +71,21 @@ class App:
         self.btn_kembali_tambah.grid(row=4, columnspan=2, pady=10)
 
     def setup_frame_edit(self):
-        self.frame_edit = tk.Frame(self.root)
-        self.label_kode_edit = tk.Label(self.frame_edit, text="Kode Barang :")
+        self.frame_edit = tk.Frame(self.root, bg="lightblue")
+        self.label_kode_edit = tk.Label(self.frame_edit, text="Kode Barang :", bg="lightblue")
         self.label_kode_edit.grid(row=0, column=0)
         self.entry_kode_edit = tk.Entry(self.frame_edit)
         self.entry_kode_edit.grid(row=0, column=1, pady=5)
 
-        self.label_nama_edit = tk.Label(self.frame_edit, text="Nama Baru :")
+        self.label_nama_edit = tk.Label(self.frame_edit, text="Nama Baru :", bg="lightblue")
         self.label_nama_edit.grid(row=1, column=0)
         self.entry_nama_edit = tk.Entry(self.frame_edit)
         self.entry_nama_edit.grid(row=1, column=1, pady=5)
 
-        self.label_harga_edit = tk.Label(self.frame_edit, text="Harga Baru :")
+        self.label_harga_edit = tk.Label(self.frame_edit, text="Harga Baru :", bg="lightblue")
         self.label_harga_edit.grid(row=2, column=0)
         self.entry_harga_edit = tk.Entry(self.frame_edit)
-        self.entry_harga_edit.grid(row=2, column=1, pady=5)
+        self.entry_harga_edit.grid(row=2, column=1, padx=10, pady=5)
 
         btn_edit = tk.Button(self.frame_edit, text="Simpan Perubahan", command= self.edit_barang)
         btn_edit.grid(row=3, columnspan=2, pady=10)
@@ -95,8 +94,8 @@ class App:
         self.btn_kembali_edit.grid(row=4, columnspan=2, pady=10)
 
     def setup_frame_hitung(self):
-        self.frame_hitung = tk.Frame(self.root)
-        self.label_cari = tk.Label(self.frame_hitung, text="Masukkan Kode Barang ( kode:jumlah,):")
+        self.frame_hitung = tk.Frame(self.root, bg="lightblue")
+        self.label_cari = tk.Label(self.frame_hitung, text="Masukkan Kode Barang ( Kode x Jumlah):", bg="lightblue")
         self.label_cari.grid(row=0, column=0, columnspan=2, pady=5)
 
         self.entry_cari = tk.Entry(self.frame_hitung, width=30)
@@ -112,16 +111,16 @@ class App:
         self.btn_kembali_hitung.grid(row=4, column=0, columnspan=2, pady=10)
 
     def setup_frame_lihat(self):
-        self.frame_lihat = tk.Frame(self.root)
-        self.text_widget = tk.Text(self.frame_lihat, height=15, width=50)
+        self.frame_lihat = tk.Frame(self.root, bg="lightblue")
+        self.text_widget = tk.Text(self.frame_lihat, height=15, width=50,bg="white", fg="black")
         self.text_widget.pack(pady=10)
 
         self.btn_kembali_lihat = tk.Button(self.frame_lihat, text="Kembali", command=self.show_main)
         self.btn_kembali_lihat.pack(pady=5)
 
     def setup_frame_hapus(self):
-        self.frame_hapus = tk.Frame(self.root)
-        self.label_hapus = tk.Label(self.frame_hapus, text="Masukkan Kode Barang yang Ingin Dihapus:")
+        self.frame_hapus = tk.Frame(self.root, bg="lightblue")
+        self.label_hapus = tk.Label(self.frame_hapus, text="Masukkan Kode Barang yang Ingin Dihapus:", bg="lightblue")
         self.label_hapus.grid(row=0, column=0, padx=10, pady=10)
 
         self.entry_hapus = tk.Entry(self.frame_hapus)
@@ -156,6 +155,7 @@ class App:
         else:
             messagebox.showwarning("Warning", "Semua field harus diisi!")
 
+    
     # Fungsi untuk melihat barang
     def show_lihat_barang(self):
         self.frame_main.pack_forget()
@@ -183,7 +183,7 @@ class App:
 
         for item in items:
             try:
-                kode, jumlah = item.split(":")
+                kode, jumlah = item.split("x") #digunakan huruf "x" sebagai ganti untuk simbol perkalian
                 jumlah = int(jumlah.strip())
                 kode = kode.strip()
 
@@ -205,7 +205,7 @@ class App:
                 else:
                     detail_barang += f"Barang dengan kode {kode} tidak ditemukan!\n\n"
             except ValueError:
-                detail_barang += f"Format input salah untuk item: {item}. Gunakan format kode:jumlah.\n\n"
+                detail_barang += f"Format input salah untuk item: {item}. Gunakan format kode x jumlah.\n\n"
 
         if detail_barang:
             self.label_hasil.config(
@@ -261,7 +261,7 @@ class App:
     def show_hapus_barang(self):
         self.frame_main.pack_forget()
         self.frame_hapus.pack(pady=20)
-
+    
     def show_edit_barang(self):
         self.frame_main.pack_forget()
         self.frame_edit.pack(pady=20)
