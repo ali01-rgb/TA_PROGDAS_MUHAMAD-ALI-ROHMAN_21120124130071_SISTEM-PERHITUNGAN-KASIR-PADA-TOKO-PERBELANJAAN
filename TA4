@@ -133,9 +133,6 @@ class App:
         self.btn_kembali_hapus = tk.Button(self.frame_hapus, text="Kembali", command=self.show_main)
         self.btn_kembali_hapus.grid(row=2, column=0, columnspan=2, pady=10)
 
-   
-
-
     # Fungsi untuk menambah barang ke database
     def tambah_barang(self):
         kode = self.entry_kode.get()
@@ -159,7 +156,6 @@ class App:
         else:
             messagebox.showwarning("Warning", "Semua field harus diisi!")
 
-    
     # Fungsi untuk melihat barang
     def show_lihat_barang(self):
         self.frame_main.pack_forget()
@@ -266,7 +262,6 @@ class App:
         self.frame_main.pack_forget()
         self.frame_hapus.pack(pady=20)
 
-    
     def show_edit_barang(self):
         self.frame_main.pack_forget()
         self.frame_edit.pack(pady=20)
